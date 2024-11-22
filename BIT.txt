@@ -1,0 +1,47 @@
+class BIT{
+private :
+    int N;
+    vector<int> bit;
+    int e()
+    {
+        return 0;
+    }
+public :
+
+
+    BIT(int N) : N(N), bit(N + 1, e()) {}
+
+    void build(vector<int> &a)
+    {
+    	for(int i = 1; i <= N; ++i)
+    	{
+    		update(i, a[i]);
+    	}
+    }
+
+    int query(int l, int r)
+    {
+    	return (query(r) - query(l - 1));
+    }
+    int query(int ind)
+    {
+    	int res = e();
+    	int i = ind;
+    	while(i >= 1)
+    	{
+    		res += bit[i];
+    		i -= (i & (-i));
+    	}
+    	return res;
+    }
+
+    void update(int ind, int val)
+    {
+    	int i = ind;
+    	while(i <= N)
+    	{
+    		bit[i] += val;
+    		i += (i & (-i));
+    	}
+    }
+};

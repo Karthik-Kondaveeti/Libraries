@@ -1,0 +1,120 @@
+template <class T> struct Segtree{
+private :
+    int N;
+    vector<T> seg, lazy;
+public :
+ 
+    T combine(T a, T b)
+    {
+        return min(a, b);
+    }
+     
+    T e()
+    {
+        return inf;
+    }
+     
+    Segtree(int N) : N(N), seg(4 * (N + 1), e()), lazy(4 * (N + 1), e()) {}
+ 
+    void build(vector<int> &a)
+    {
+        assert(a.size());
+        build(a, 0, N - 1, 1);
+    }
+    void build(vector<int> &a, int start, int end, int ind)
+    {
+        if(start == end)
+        {
+            seg[ind] = a[start];
+            return;
+        }
+     
+        int mid = start + (end - start) / 2;
+        int left = 2 * ind, right = 2 * ind + 1;
+        build(a, start, mid, left);
+        build(a, mid + 1, end, right);
+     
+        seg[ind] = combine(seg[left], seg[right]);
+    }
+
+    void propogate(int ind, int start, int end)
+    {
+        if(lazy[ind] != 0)
+        {
+            seg[ind] = combine(seg[ind], lazy[ind]);
+            if(start != end)
+            {
+                int left = 2 * ind, right = 2 * ind + 1;
+                lazy[left] = combine(lazy[left], lazy[ind]);
+                lazy[right] = combine(lazy[right], lazy[ind]);
+            }
+            lazy[ind] = e();
+        }
+    }
+ 
+    void update(int pos, T val)
+    {
+        assert(0 <= pos && pos <= N - 1);
+        update(0, N - 1, 1, pos, val);
+    }
+    void update(int start, int end, int ind, int pos, T val)
+    {
+        propogate(ind, start, end);
+        if(start == end)
+        {
+            seg[ind] = val;
+            return;
+        }
+     
+        int mid = start + (end - start) / 2;
+        int left = 2 * ind, right = 2 * ind + 1;
+        if(pos <= mid)
+            update(start, mid, left, pos, val);
+        else
+            update(mid + 1, end, right, pos, val);
+     
+        seg[ind] = combine(seg[left], seg[right]);
+    }
+     
+    T query(int l, int r)
+    {
+        assert(0 <= l && r <= N - 1);
+        return query(l, r, 0, N - 1, 1);
+    }
+    T query(int l, int r, int start, int end, int ind)
+    {
+        propogate(ind, start, end);
+        if(l <= start && end <= r)
+            return seg[ind];
+        if(end < l || r < start)
+            return e();
+     
+        int mid = start + (end - start) / 2;
+        int left = 2 * ind, right = 2 * ind + 1;
+        
+        return combine(query(l, r, start, mid, left), query(l, r, mid + 1, end, right));
+    }
+
+    void rangeupdate(int l, int r, T val)
+    {
+        assert(0 <= l && r <= N - 1 && l <= r);
+        rangeupdate(l, r, val, 0, N - 1, 1);
+    }
+    void rangeupdate(int l, int r, T val, int start, int end, int ind)
+    {
+        propogate(ind, start, end);
+        if(l <= start && end <= r)
+        {
+            lazy[ind] = val;
+            return;
+        }
+        if(r < start || end < l)
+            return;
+    
+        int mid = start + (end - start) / 2;
+        int left = 2 * ind, right = 2 * ind + 1;
+    
+        rangeupdate(l, r, val, start, mid, left);
+        rangeupdate(l, r, val, mid + 1, end, right);
+    }
+};

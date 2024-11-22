@@ -1,0 +1,18 @@
+int N = 2e5 + 5;
+vi fact(N, 1);
+
+void comp()
+{
+    fact[1] = 1;
+    fact[0] = 1;
+    fse(i, 2, N - 1)
+        fact[i] = mul(i, fact[i - 1]);
+}
+
+int ncr(int n, int r) 
+{
+    if(n < r) return 0;
+    int num = fact[n];
+    int den = mul(fact[n - r], fact[r]);
+    return mdiv(num, den);
+}

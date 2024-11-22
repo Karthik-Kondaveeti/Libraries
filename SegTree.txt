@@ -1,0 +1,80 @@
+template <class T> struct Segtree{
+public :
+    int N;
+    vector<T> seg;
+ 
+    T combine(T a, T b)
+    {
+        return min(a, b);
+    }
+     
+    T e()
+    {
+        return INT_MAX;
+    }
+     
+    Segtree(int N) : N(N), seg(4 * (N + 1), e()) {}
+ 
+    void build(vector<int> &a)
+    {
+        build(a, 0, N - 1, 1);
+    }
+    void build(vector<int> &a, int start, int end, int ind)
+    {
+        if(start == end)
+        {
+            seg[ind] = a[start];
+            return;
+        }
+     
+        int mid = start + (end - start) / 2;
+        int left = 2 * ind, right = 2 * ind + 1;
+        build(a, start, mid, left);
+        build(a, mid + 1, end, right);
+     
+        seg[ind] = combine(seg[left], seg[right]);
+    }
+ 
+    void update(int pos, T val)
+    {
+        update(0, N - 1, 1, pos, val);
+    }
+    void update(int start, int end, int ind, int pos, T val)
+    {
+        if(start == end)
+        {
+            seg[ind] = val;
+            return;
+        }
+     
+        int mid = start + (end - start) / 2;
+        int left = 2 * ind, right = 2 * ind + 1;
+        if(pos <= mid)
+            update(start, mid, left, pos, val);
+        else
+            update(mid + 1, end, right, pos, val);
+     
+        seg[ind] = combine(seg[left], seg[right]);
+    }
+     
+    T query(int l, int r)
+    {
+        return query(l, r, 0, N - 1, 1);
+    }
+    T queryAll()
+    {
+        return query(0, N - 1, 0, N - 1, 1);
+    }
+    T query(int l, int r, int start, int end, int ind)
+    {
+        if(l <= start && end <= r)
+            return seg[ind];
+        if(end < l || r < start)
+            return e();
+     
+        int mid = start + (end - start) / 2;
+        int left = 2 * ind, right = 2 * ind + 1;
+        
+        return combine(query(l, r, start, mid, left), query(l, r, mid + 1, end, right));
+    }
+};

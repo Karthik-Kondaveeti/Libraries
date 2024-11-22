@@ -1,0 +1,53 @@
+class sqrdecomp {
+private :
+	int N;
+	int e()
+	{
+		return 0;
+	}
+public : 
+	vector<int> sq;
+	void build(vector<int> &a)
+	{
+		N = (int)(ceil(sqrt(a.size())));
+		sq.assign(N + 1, e());
+
+		int bucket = -1;
+		for(int i = 0; i < a.size(); ++i)
+		{
+			if(i % N == 0)
+				bucket++;
+			sq[bucket] += a[i];
+		}
+	}
+
+	void update(int pos, int val, vector<int> &a)
+	{
+		int bucket = pos / N;
+		sq[bucket] += val - a[pos];
+		a[pos] = val;
+	}
+
+	int query(int l, int r, vector<int> &a)
+	{
+		if(r < l)
+			return 0;
+		int sum = 0;
+		while(l % N != 0 and l < r)
+		{
+			sum += a[l];
+			l++;
+		}
+		while(l + N - 1 <= r)
+		{
+			sum += sq[l / N];
+			l += N;
+		}
+		while(l <= r)
+		{
+			sum += a[l];
+			l++;
+		}
+		return sum;
+	}
+};
